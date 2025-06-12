@@ -195,15 +195,25 @@ export const FlowchartToExcalidrawSkeletonConverter = new GraphConverter({
       const { startX, startY, reflectionPoints } = edge;
 
       // Calculate Excalidraw arrow's points
-      const points = reflectionPoints.map((point) => [
-        point.x - reflectionPoints[0].x,
-        point.y - reflectionPoints[0].y,
-      ]);
+      const points = reflectionPoints.map(
+        (point) =>
+          [
+            point.x - reflectionPoints[0].x,
+            point.y - reflectionPoints[0].y,
+          ] as const
+      );
 
       // Get supported arrow type
       const arrowType = computeExcalidrawArrowType(edge.type);
 
       const arrowId = `${edge.start}_${edge.end}`;
+      
+      // Bind start and end vertex to arrow
+      const startVertex = elements.find((e) => e.id === edge.start);
+      const endVertex = elements.find((e) => e.id === edge.end);
+      if (!startVertex || !endVertex) {
+        return;
+      }
       const containerElement: ExcalidrawElementSkeleton = {
         id: arrowId,
         type: "arrow",
@@ -222,20 +232,13 @@ export const FlowchartToExcalidrawSkeletonConverter = new GraphConverter({
           type: 2,
         },
         ...arrowType,
-      };
-
-      // Bind start and end vertex to arrow
-      const startVertex = elements.find((e) => e.id === edge.start);
-      const endVertex = elements.find((e) => e.id === edge.end);
-      if (!startVertex || !endVertex) {
-        return;
-      }
-
-      containerElement.start = {
-        id: startVertex.id || "",
-      };
-      containerElement.end = {
-        id: endVertex.id || "",
+        // Move start and end inside the declaration
+        start: {
+          id: startVertex.id || "",
+        },
+        end: {
+          id: endVertex.id || "",
+        },
       };
 
       elements.push(containerElement);

@@ -92,10 +92,10 @@ export const transformToExcalidrawArrowSkeleton = (arrow: Arrow) => {
     type: "arrow",
     x: arrow.startX,
     y: arrow.startY,
-    points: arrow.points || [
+    points: arrow.points || ([
       [0, 0],
       [arrow.endX - arrow.startX, arrow.endY - arrow.startY],
-    ],
+    ] as const),    
     width: arrow.endX - arrow.startX,
     height: arrow.endY - arrow.startY,
     strokeStyle: arrow?.strokeStyle || "solid",
